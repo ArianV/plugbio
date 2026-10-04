@@ -55,7 +55,4 @@ so you can follow any page from URL to HTML in one or two files.
 
 ## Stack
 
-PHP 8 · SQLite · vanilla JS · hand-written CSS · Apache + PHP-FPM · Cloudflare
-
-Fonts: [Inter](https://github.com/rsms/inter) and [Space Grotesk](https://github.com/floriankarsten/space-grotesk),
-both under the SIL Open Font License ([`assets/fonts/OFL.txt`](assets/fonts/OFL.txt)).
+PHP 8 · SQLite · vanilla JS · CSS
