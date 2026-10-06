@@ -341,3 +341,11 @@ a.pager-num:hover{color:var(--text); background:var(--surface-2); border-color:v
 .pager-gap{color:var(--faint); padding:0 4px}
 .pager .btn[aria-disabled="true"]{opacity:.35; cursor:default; pointer-events:none}
 @media (max-width:520px){ .pager{justify-content:center} .pager-pages{order:-1; width:100%; justify-content:center} }
+
+/* ---------- Feed sort switcher ---------- */
+.section-head{flex-wrap:wrap}
+.section-tools{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.sort-tabs{display:inline-flex; padding:4px; border-radius:999px; background:var(--surface); border:1px solid var(--border)}
+.sort-tab{padding:7px 14px; border-radius:999px; font-size:13.5px; font-weight:600; color:var(--muted); white-space:nowrap; transition:color .15s, background .15s}
+.sort-tab:hover{color:var(--text)}
+.sort-tab.current{color:#06120d; background:var(--accent)}
