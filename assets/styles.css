@@ -329,3 +329,15 @@ input[type=file]::file-selector-button{font:600 13px var(--font); color:var(--te
 .thumb{width:48px; height:48px; border-radius:10px; object-fit:cover; flex:none; background:var(--solid); border:1px solid var(--border)}
 .thumb.placeholder{display:flex; align-items:center; justify-content:center; color:var(--muted); background:linear-gradient(135deg, rgba(110,242,195,.2), rgba(139,123,255,.2))}
 @media (max-width:700px){ .tbl td[data-label="Page"]{display:block} .tbl td[data-label="Page"]::before{display:none} }
+
+/* ---------- Feed pager ---------- */
+#discover{scroll-margin-top:80px}   /* so "#discover" links land below the sticky nav */
+.pager{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:32px}
+.pager-pages{display:flex; align-items:center; gap:6px}
+.pager-num{min-width:40px; height:40px; padding:0 10px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px;
+  font-weight:600; font-size:14px; color:var(--muted); border:1px solid transparent; transition:color .15s, background .15s, border-color .15s}
+a.pager-num:hover{color:var(--text); background:var(--surface-2); border-color:var(--border)}
+.pager-num.current{color:#06120d; background:var(--accent)}
+.pager-gap{color:var(--faint); padding:0 4px}
+.pager .btn[aria-disabled="true"]{opacity:.35; cursor:default; pointer-events:none}
+@media (max-width:520px){ .pager{justify-content:center} .pager-pages{order:-1; width:100%; justify-content:center} }

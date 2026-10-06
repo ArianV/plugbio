@@ -3,10 +3,19 @@
 
 require_once __DIR__ . '/../config.php';
 
-// Public feed; no auth required.
+// Public feed; no auth required. Shows FEED_SIZE songs per page: /?page=2, /?page=3, …
+$total    = (int)db()->query('SELECT count(*) FROM pages WHERE published')->fetchColumn();
+$lastPage = max(1, (int)ceil($total / FEED_SIZE));
+$pageNum  = max(1, (int)($_GET['page'] ?? 1));
 
-// Query newest public pages (you can later switch to a trending score)
-$sql = "
+// Address of a given feed page (works for both "/" and "/feed")
+$feedUrl = fn(int $n): string => asset(ltrim(request_path(), '/')) . ($n > 1 ? '?page=' . $n : '');
+
+// Past the end (e.g. an old link after songs were removed)? Send them to the last page.
+if ($pageNum > $lastPage) { header('Location: ' . $feedUrl($lastPage)); exit; }
+
+// Newest public pages first; the id tie-break keeps the order stable from one page to the next
+$st = db()->prepare("
   SELECT
     p.id,
     p.title,
@@ -18,13 +27,20 @@ $sql = "
   FROM pages p
   JOIN users u ON u.id = p.user_id
   WHERE p.published
-  ORDER BY COALESCE(p.updated_at, p.created_at) DESC
-  LIMIT :n
-";
-$st = db()->prepare($sql);
+  ORDER BY COALESCE(p.updated_at, p.created_at) DESC, p.id DESC
+  LIMIT :n OFFSET :skip
+");
 $st->bindValue(':n', FEED_SIZE, PDO::PARAM_INT);
+$st->bindValue(':skip', ($pageNum - 1) * FEED_SIZE, PDO::PARAM_INT);
 $st->execute();
 $pages = $st->fetchAll(PDO::FETCH_ASSOC);
+
+// Page numbers to show in the pager: first, last, and the ones around the current page (null = a gap "…")
+$pagerItems = [];
+foreach (array_unique(array_filter([1, $pageNum - 1, $pageNum, $pageNum + 1, $lastPage], fn($n) => $n >= 1 && $n <= $lastPage)) as $n) {
+  if ($pagerItems && $n - end($pagerItems) > 1) $pagerItems[] = null;
+  $pagerItems[] = $n;
+}
 
 // helper: initial for placeholder
 function initial_for(?string $s): string {
@@ -34,8 +50,10 @@ function initial_for(?string $s): string {
 
 $me    = current_user();
 $title = $me ? 'Discover · PlugBio' : 'PlugBio · Smart links for your music';
+if ($pageNum > 1) $title = "Discover · Page $pageNum · PlugBio";
 meta_set([
-  'url'    => asset(''),   // "/" and "/feed" are the same page; tell search engines which address to use
+  // "/" and "/feed" are the same page; tell search engines which address to use (each feed page has its own)
+  'url'    => asset($pageNum > 1 ? '?page=' . $pageNum : ''),
   'jsonld' => [
     '@context'    => 'https://schema.org',
     '@type'       => 'WebSite',
@@ -48,14 +66,14 @@ $play  = '<svg viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a
 
 ob_start();
 ?>
-<?php if (!$me): ?>
+<?php if (!$me && $pageNum === 1): ?>
   <section class="hero">
     <div class="eyebrow"><b>●</b> One link for every platform</div>
     <h1>Share your music <span class="gradient-text">everywhere</span>, with one link.</h1>
     <p>Build a beautiful landing page for every release. Fans pick their favorite streaming service, and you see what they click.</p>
     <div class="cta-row">
       <a class="btn btn-primary btn-lg" href="<?= e(asset('register')) ?>">Create your first page</a>
-      <a class="btn btn-lg" href="#discover">See examples</a>
+      <a class="btn btn-lg" href="#discover">Discover Songs</a>
     </div>
     <div class="services" aria-label="Supported services">
       <span>Spotify</span><span>Apple Music</span><span>YouTube</span><span>SoundCloud</span><span>TIDAL</span><span>Deezer</span><span>Bandcamp</span>
@@ -66,8 +84,10 @@ ob_start();
 <section id="discover">
   <div class="section-head">
     <div>
-      <h2><?= $me ? 'Discover' : 'Fresh releases' ?></h2>
-      <div class="muted small">The latest pages from artists on PlugBio</div>
+      <h2><?= ($me || $pageNum > 1) ? 'Discover' : 'Fresh releases' ?></h2>
+      <div class="muted small">
+        The latest pages from artists on PlugBio<?= $lastPage > 1 ? ' · page ' . $pageNum . ' of ' . $lastPage : '' ?>
+      </div>
     </div>
     <?php if ($me): ?><a class="btn btn-primary" href="<?= e(asset('pages/new')) ?>">+ New page</a><?php endif; ?>
   </div>
@@ -94,6 +114,34 @@ ob_start();
         </a>
       <?php endforeach; ?>
     </div>
+
+    <?php if ($lastPage > 1): ?>
+      <nav class="pager" aria-label="Pages">
+        <?php if ($pageNum > 1): ?>
+          <a class="btn" rel="prev" href="<?= e($feedUrl($pageNum - 1)) ?>#discover">← Previous</a>
+        <?php else: ?>
+          <span class="btn" aria-disabled="true">← Previous</span>
+        <?php endif; ?>
+
+        <div class="pager-pages">
+          <?php foreach ($pagerItems as $n): ?>
+            <?php if ($n === null): ?>
+              <span class="pager-gap">…</span>
+            <?php elseif ($n === $pageNum): ?>
+              <span class="pager-num current" aria-current="page"><?= $n ?></span>
+            <?php else: ?>
+              <a class="pager-num" href="<?= e($feedUrl($n)) ?>#discover" aria-label="Page <?= $n ?>"><?= $n ?></a>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
+
+        <?php if ($pageNum < $lastPage): ?>
+          <a class="btn btn-primary" rel="next" href="<?= e($feedUrl($pageNum + 1)) ?>#discover">Next →</a>
+        <?php else: ?>
+          <span class="btn" aria-disabled="true">Next →</span>
+        <?php endif; ?>
+      </nav>
+    <?php endif; ?>
   <?php endif; ?>
 </section>
 <?php

@@ -24,7 +24,7 @@ const LOGIN_LOCKOUT_MINUTES = 15;
 const USERNAME_CHANGES_ALLOWED = 2;
 const USERNAME_CHANGE_DAYS     = 14;
 
-// How many pages the home page shows.
+// How many songs the home feed shows per page (more than this and it splits into page 2, 3, …).
 const FEED_SIZE = 24;
 
 // =====================================================================
