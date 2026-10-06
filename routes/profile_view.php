@@ -101,7 +101,7 @@ meta_set([
 
 ob_start(); ?>
 <section class="card profile-head">
-  <img class="pfp" src="<?= e($avatar) ?>" alt="">
+  <img class="pfp" src="<?= e(thumb_url($avatar, 200)) ?>" alt="">
   <div class="who">
     <h1><?= e($display) ?></h1>
     <div class="mono">@<?= e($owner['handle'] ?? '') ?> · <?= count($pages) ?> release<?= count($pages) === 1 ? '' : 's' ?></div>
@@ -130,7 +130,7 @@ ob_start(); ?>
     <?php foreach ($pages as $p): ?>
       <a class="card-link" href="<?= e(page_url($p)) ?>">
         <?php if (!empty($p['cover_uri'])): ?>
-          <div class="card-media"><img src="<?= e($p['cover_uri']) ?>" alt="" loading="lazy"></div>
+          <div class="card-media"><img src="<?= e(thumb_url($p['cover_uri'], 400)) ?>" alt="" loading="lazy" decoding="async"></div>
         <?php else: ?>
           <div class="card-media placeholder">♪</div>
         <?php endif; ?>

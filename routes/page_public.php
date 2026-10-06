@@ -109,7 +109,7 @@ record_page_view((int)$page['id'], $owner_id);
 
 $full_bleed = true;
 ob_start(); ?>
-<?php if ($cover): ?><div class="song-bg" style="background-image:url('<?= e($cover) ?>')"></div><?php endif; ?>
+<?php if ($cover): ?><div class="song-bg" style="background-image:url('<?= e(thumb_url($cover, 200)) ?>')"></div><?php endif; ?>
 <div class="wrap">
   <article class="song">
     <?php if (!$is_public): ?>
@@ -119,7 +119,7 @@ ob_start(); ?>
     <?php endif; ?>
 
     <?php if ($cover): ?>
-      <div class="cover-wrap"><img src="<?= e($cover) ?>" alt="<?= e($title) ?> cover art"></div>
+      <div class="cover-wrap"><img src="<?= e(thumb_url($cover, 800)) ?>" alt="<?= e($title) ?> cover art" width="800" height="800" fetchpriority="high"></div>
     <?php else: ?>
       <div class="cover-wrap placeholder" aria-hidden="true">♪</div>
     <?php endif; ?>

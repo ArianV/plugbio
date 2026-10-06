@@ -45,7 +45,7 @@ ob_start(); ?>
     <div class="editor-section">
       <label for="f-cover">Cover art</label>
       <?php if (!empty($form['cover'])): ?>
-        <img class="cover-preview" src="<?= e($form['cover']) ?>" alt="Current cover">
+        <img class="cover-preview" src="<?= e(thumb_url($form['cover'], 400)) ?>" alt="Current cover">
       <?php endif; ?>
       <input type="file" id="f-cover" name="cover" accept="image/jpeg,image/png,image/webp,image/gif">
       <div class="hint">Square images look best. JPG, PNG, WebP or GIF, up to <?= UPLOAD_MAX_MB ?> MB.</div>

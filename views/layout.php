@@ -34,7 +34,7 @@ $full_bleed = $full_bleed ?? false;
 <head>
   <meta charset="utf-8">
   <title><?= e($title) ?></title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
@@ -90,7 +90,7 @@ $full_bleed = $full_bleed ?? false;
         <div class="nav-user">
           <button class="avatar-btn" id="navAvatarBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Open user menu">
             <?php if ($avatar): ?>
-              <img class="avatar-img" src="<?= e($avatar) ?>" alt="">
+              <img class="avatar-img" src="<?= e(thumb_url($avatar, 96)) ?>" alt="">
             <?php else: ?>
               <span class="avatar-img" aria-hidden="true"><?= e($initial) ?></span>
             <?php endif; ?>

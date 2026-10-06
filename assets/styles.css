@@ -349,3 +349,108 @@ a.pager-num:hover{color:var(--text); background:var(--surface-2); border-color:v
 .sort-tab{padding:7px 14px; border-radius:999px; font-size:13.5px; font-weight:600; color:var(--muted); white-space:nowrap; transition:color .15s, background .15s}
 .sort-tab:hover{color:var(--text)}
 .sort-tab.current{color:#06120d; background:var(--accent)}
+
+/* =====================================================================
+   Phones. Most visitors arrive from Instagram's in-app browser, so
+   everything below is tuned for a 360–430px wide screen and a thumb.
+   ===================================================================== */
+html{-webkit-tap-highlight-color:transparent}
+body{min-height:100dvh}
+/* keep clear of the notch / home indicator */
+.nav{padding-left:max(20px, env(safe-area-inset-left)); padding-right:max(20px, env(safe-area-inset-right))}
+.site-footer{padding-bottom:max(40px, calc(env(safe-area-inset-bottom) + 24px))}
+code{overflow-wrap:anywhere}
+
+/* Touch screens have no hover: without this, a tapped card stays "lifted" */
+@media (hover:none){
+  .card-link:hover{transform:none; box-shadow:none; background:var(--surface); border-color:var(--border)}
+  .card-link:hover .card-media img{transform:none}
+  .card-media .play{display:none}
+  .svc-btn:hover{transform:none}
+  .svc-btn:hover .svc-cta{background:rgba(255,255,255,.1); color:inherit}
+  .svc-btn:active{background:rgba(255,255,255,.14)}
+  .svc-btn:active .svc-cta{background:var(--accent); color:#06120d}
+}
+
+@media (max-width:600px){
+  .wrap{margin:20px auto 44px; padding:0 16px}
+  .nav{padding-top:8px; padding-bottom:8px; padding-left:max(14px, env(safe-area-inset-left)); padding-right:max(14px, env(safe-area-inset-right))}
+  h1{font-size:26px}
+  .card{padding:18px}
+
+  /* iPhones zoom the whole page when a tapped field's text is under 16px */
+  input[type=text],input[type=email],input[type=password],input[type=url],input[type=tel],textarea,select{font-size:16px}
+
+  /* thumb-sized tap targets */
+  .nav a.link{padding:11px 12px}
+  .sort-tab{padding:11px 16px}
+  .btn-sm{height:38px; padding:0 14px}
+  .menu a,.menu button{padding:13px 12px}
+  .link-row .remove{min-height:44px}
+
+  /* Home: a shorter hero so the music is on the first screen */
+  .hero{padding:22px 0 26px}
+  .hero .eyebrow{margin-bottom:14px; font-size:12.5px; padding:5px 12px}
+  .hero h1{font-size:33px; margin-bottom:12px; text-wrap:balance}
+  .hero p{font-size:15.5px; margin-bottom:20px}
+  .hero .cta-row{gap:10px}
+  .hero .cta-row .btn{flex:1 1 0; height:46px; padding:0 12px; font-size:14.5px}
+  .hero .services{display:none}
+
+  /* Grids: two covers per row instead of one screen-filling cover */
+  .section-head{align-items:flex-start; margin-bottom:14px}
+  .section-tools{width:100%; justify-content:space-between}
+  .grid-cards{grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px}
+  .card-link{padding:8px; border-radius:14px}
+  .card-media{border-radius:10px}
+  .card-media.placeholder{font-size:34px}
+  .card-body{padding:9px 2px 2px}
+  .card-title{font-size:14px}
+  .card-meta{font-size:12.5px}
+  .pager{margin-top:24px}
+
+  /* Song page: smaller cover, so the streaming buttons are visible without scrolling */
+  .song{margin:0 auto 28px}
+  .song .cover-wrap{width:min(62vw, 250px); margin:0 auto; border-radius:16px}
+  .song h1{font-size:23px; margin:16px 0 2px; text-wrap:balance; overflow-wrap:anywhere}
+  .song .artist{font-size:14.5px; margin-bottom:16px}
+  .svc-list{gap:9px}
+  .svc-btn{padding:10px 10px 10px 12px; border-radius:13px}
+  .svc-btn .svc-cta{padding:9px 16px}
+  .song-foot{margin-top:22px}
+
+  /* Profile */
+  .profile-head{padding:18px; gap:14px; margin-bottom:22px; align-items:flex-start}
+  .profile-head .pfp{width:68px; height:68px; box-shadow:0 0 0 4px rgba(110,242,195,.08)}
+  .profile-head .who{min-width:0; flex-basis:calc(100% - 90px)}
+  .profile-head h1{font-size:22px}
+  .profile-head .bio{font-size:14.5px}
+
+  /* Auth */
+  .auth{margin:20px auto}
+  .auth .card{padding:24px 20px}
+
+  /* Editor header: back link, then the title on its own line, then the actions */
+  .titlebar{gap:10px; margin-bottom:16px}
+  .titlebar h1{flex:1 0 100%; order:2}
+  .titlebar .btn{order:3}
+  .form-actions .btn-primary{flex:1}
+
+  /* Stacked tables (dashboard, analytics): left-align the row's title and give the actions room */
+  .tbl tr{padding:14px 4px}
+  .tbl td[data-label="Page"]{text-align:left; font-size:15.5px; padding-bottom:8px}
+  .tbl td.actions{gap:6px 14px; align-items:center; padding-top:12px}
+  .tbl td.actions .link{padding:9px 4px}
+  .tbl td.actions .copy-btn{margin-right:auto}
+  .stats{grid-template-columns:1fr 1fr; gap:10px}
+  .stat{padding:14px 16px}
+  .stat .value{font-size:26px}
+}
+
+/* Small phones (iPhone SE, older Androids) */
+@media (max-width:360px){
+  .hero h1{font-size:29px}
+  .hero .cta-row{flex-direction:column}
+  .hero .cta-row .btn{flex:none; width:100%}
+  .brand span{display:none}
+}

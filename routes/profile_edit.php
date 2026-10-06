@@ -99,7 +99,7 @@ ob_start(); ?>
     <div class="card">
       <h3>Basics</h3>
       <div class="row pfp-edit">
-        <img src="<?= e($avatar) ?>" alt="Current avatar">
+        <img src="<?= e(thumb_url($avatar, 200)) ?>" alt="Current avatar">
         <div style="flex:1">
           <label for="avatar">Avatar</label>
           <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif">

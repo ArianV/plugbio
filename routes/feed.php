@@ -130,7 +130,7 @@ ob_start();
       <?php foreach ($pages as $p): ?>
         <a class="card-link" href="<?= e(page_url($p)) ?>">
           <?php if (!empty($p['cover_uri'])): ?>
-            <div class="card-media"><img src="<?= e($p['cover_uri']) ?>" alt="" loading="lazy"><span class="play"><?= $play ?></span></div>
+            <div class="card-media"><img src="<?= e(thumb_url($p['cover_uri'], 400)) ?>" alt="" loading="lazy" decoding="async"><span class="play"><?= $play ?></span></div>
           <?php else: ?>
             <div class="card-media placeholder"><?= e(initial_for($p['artist_name'] ?? $p['title'] ?? '')) ?><span class="play"><?= $play ?></span></div>
           <?php endif; ?>

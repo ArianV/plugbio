@@ -20,6 +20,23 @@ if (preg_match('#^/(assets|uploads)/#', $uri, $m)) {
     readfile($path);
     exit;
   }
+
+  // A thumbnail that doesn't exist yet: make it now. From the next request on it's a static file.
+  require_once __DIR__ . '/lib/thumbs.php';
+  if (preg_match(THUMB_PATTERN, $uri, $t)) {
+    $made = make_thumb(__DIR__ . '/uploads', (int)$t[1], $t[2]);
+    if ($made) {
+      header('Content-Type: image/webp');
+      header('Cache-Control: public, max-age=31536000, immutable');
+      header('X-Content-Type-Options: nosniff');
+      readfile($made);
+      exit;
+    }
+    if (is_file(__DIR__ . '/uploads/' . $t[2])) {   // can't resize here (e.g. no image library): use the original
+      header('Location: ' . $base . '/uploads/' . $t[2], true, 302);
+      exit;
+    }
+  }
   http_response_code(404);
   exit;
 }

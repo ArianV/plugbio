@@ -56,7 +56,7 @@ ob_start(); ?>
         <td data-label="Page">
           <div class="page-cell">
             <?php if (!empty($r['cover_uri'])): ?>
-              <img class="thumb" src="<?= e($r['cover_uri']) ?>" alt="">
+              <img class="thumb" src="<?= e(thumb_url($r['cover_uri'], 96)) ?>" alt="" loading="lazy" decoding="async">
             <?php else: ?>
               <span class="thumb placeholder">♪</span>
             <?php endif; ?>
