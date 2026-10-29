@@ -15,6 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   [$cover_uri, $err] = save_uploaded_image('cover', 'cover');
   if ($title === '') $err = 'Please enter a title.';
+  // No upload: use the official artwork the link lookup found, if any.
+  if (!$err && !$cover_uri) $cover_uri = save_found_cover((string)($_POST['cover_found'] ?? ''));
 
   if (!$err) {
     $pdo = db();
@@ -41,6 +43,7 @@ $form = [
   'title'     => $_POST['title']  ?? '',
   'artist'    => $_POST['artist'] ?? '',
   'cover'     => null,
+  'cover_found' => (string)($_POST['cover_found'] ?? ''),
   'published' => ($_POST['published'] ?? '0') === '1',
   'links'     => array_filter(array_map('trim', (array)($_POST['links_url'] ?? []))),
 ];

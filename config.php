@@ -27,6 +27,16 @@ const USERNAME_CHANGE_DAYS     = 14;
 // How many songs the home feed shows per page (more than this and it splits into page 2, 3, …).
 const FEED_SIZE = 24;
 
+// Keys for finding a song's links on other platforms when someone pastes one (lib/lookup.php).
+// They're secret, so the real values go in config.local.php (git-ignored), e.g.
+//   <?php
+//   const SPOTIFY_CLIENT_ID = '…'; const SPOTIFY_CLIENT_SECRET = '…'; const YOUTUBE_API_KEY = '…';
+// Left empty, that platform is just skipped; Apple Music and Deezer need no key.
+if (is_file(__DIR__ . '/config.local.php')) require __DIR__ . '/config.local.php';
+defined('SPOTIFY_CLIENT_ID')     || define('SPOTIFY_CLIENT_ID', '');
+defined('SPOTIFY_CLIENT_SECRET') || define('SPOTIFY_CLIENT_SECRET', '');
+defined('YOUTUBE_API_KEY')       || define('YOUTUBE_API_KEY', '');
+
 // =====================================================================
 //  Everything below is plumbing; you shouldn't need to edit it.
 // =====================================================================
@@ -149,6 +159,7 @@ if (!is_dir(UPLOAD_DIR)) @mkdir(UPLOAD_DIR, 0775, true);
 require_once __DIR__ . '/lib/pages.php';
 require_once __DIR__ . '/lib/uploads.php';
 require_once __DIR__ . '/lib/thumbs.php';
+require_once __DIR__ . '/lib/lookup.php';
 
 // ---------- Helpers ----------
 function page_cover(array $row): ?string {

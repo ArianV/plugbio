@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Cover: keep unless replaced
   [$new_cover, $err] = save_uploaded_image('cover', 'cover');
   if ($title === '') $err = 'Please enter a title.';
+  if (!$err && !$new_cover && !$cover_val) $new_cover = save_found_cover((string)($_POST['cover_found'] ?? ''));
 
   if (!$err) {
     // Once a page is published its URL is out in the world, so keep the slug stable.

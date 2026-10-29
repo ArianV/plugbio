@@ -38,8 +38,9 @@ ob_start(); ?>
       <div id="links-list"></div>
       <div class="btn-row">
         <button type="button" class="btn btn-sm" id="add-link">+ Add link</button>
-        <span class="hint" style="margin:0">Paste any link, the service is detected automatically.</span>
+        <span class="hint" style="margin:0">Paste a Spotify, Apple Music, Deezer, SoundCloud or YouTube link and I'll find the song on the other platforms.</span>
       </div>
+      <div class="hint lookup-status" id="lookup-status" aria-live="polite" hidden></div>
     </div>
 
     <div class="editor-section">
@@ -47,6 +48,11 @@ ob_start(); ?>
       <?php if (!empty($form['cover'])): ?>
         <img class="cover-preview" src="<?= e(thumb_url($form['cover'], 400)) ?>" alt="Current cover">
       <?php endif; ?>
+      <input type="hidden" name="cover_found" id="f-cover-found" value="<?= e($form['cover_found'] ?? '') ?>">
+      <div id="cover-found" hidden>
+        <img class="cover-preview" alt="Official cover art">
+        <div class="hint" style="margin:-4px 0 10px">Using the official cover art. Upload your own below to replace it, or <button type="button" class="link-btn" id="cover-found-remove">don't use it</button>.</div>
+      </div>
       <input type="file" id="f-cover" name="cover" accept="image/jpeg,image/png,image/webp,image/gif">
       <div class="hint">Square images look best. JPG, PNG, WebP or GIF, up to <?= UPLOAD_MAX_MB ?> MB.</div>
     </div>
@@ -100,9 +106,68 @@ ob_start(); ?>
     return input;
   }
 
+  /* ---- finding the song on other platforms when a link is pasted ---- */
+  const lookupUrl  = <?= json_encode(asset('pages/lookup'), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) ?>;
+  const hasCover   = <?= empty($form['cover']) ? 'false' : 'true' ?>;
+  const csrf       = document.querySelector('input[name=csrf]').value;
+  const statusEl   = document.getElementById('lookup-status');
+  const titleIn    = document.getElementById('f-title'), artistIn = document.getElementById('f-artist');
+  const fileIn     = document.getElementById('f-cover'), foundIn  = document.getElementById('f-cover-found');
+  const foundBox   = document.getElementById('cover-found');
+  const lookupable = ['Spotify', 'Apple Music', 'Deezer', 'SoundCloud', 'YouTube'];
+  const tried      = new Set();
+
+  const say = (msg) => { statusEl.textContent = msg; statusEl.hidden = !msg; };
+  const showFoundCover = (url) => {
+    foundIn.value = url || '';
+    foundBox.hidden = !url;
+    if (url) foundBox.querySelector('img').src = url;
+  };
+  document.getElementById('cover-found-remove').addEventListener('click', () => showFoundCover(''));
+  fileIn.addEventListener('change', () => { if (fileIn.files.length) showFoundCover(''); });
+  if (foundIn.value && !hasCover) showFoundCover(foundIn.value);
+
+  function lookup(input){
+    const url = input.value.trim();
+    if (!/^https?:\/\//i.test(url) || !lookupable.includes(detect(url)) || tried.has(url)) return;
+    tried.add(url);
+    say('Looking for this song on other platforms…');
+
+    const body = new FormData();
+    body.append('csrf', csrf);
+    body.append('url', url);
+    fetch(lookupUrl, { method: 'POST', body, credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(res => {
+        if (!res.ok) { say(res.error || "Couldn't look that link up. Add the other platforms by hand."); return; }
+        if (!titleIn.value.trim()  && res.title)  titleIn.value  = res.title;
+        if (!artistIn.value.trim() && res.artist) artistIn.value = res.artist;
+        if (!hasCover && !fileIn.files.length && !foundIn.value && res.cover) showFoundCover(res.cover);
+
+        // Only add platforms the form doesn't have yet; never overwrite a link someone typed.
+        const inputs = () => [...list.querySelectorAll('input')];
+        const have = new Set(inputs().map(i => detect(i.value)));
+        const added = [];
+        res.links.forEach(l => {
+          if (have.has(l.label)) return;
+          const empty = inputs().find(i => !i.value.trim());
+          if (empty) { empty.value = l.url; empty.dispatchEvent(new Event('input')); } else addRow(l.url);
+          have.add(l.label);
+          added.push(l.label);
+        });
+        say(added.length
+          ? 'Found it on ' + added.join(', ') + '. Give the links a quick check before saving.'
+          : "Couldn't find it on any other platforms yet. New releases can take a day to show up everywhere.");
+      })
+      .catch(() => say("Couldn't look that link up right now. Add the other platforms by hand."));
+  }
+  // Paste fires before the text lands in the box, so wait a tick; "change" covers typing and autofill.
+  list.addEventListener('paste', e => { if (e.target.matches('input')) setTimeout(() => lookup(e.target), 0); });
+  list.addEventListener('change', e => { if (e.target.matches('input')) lookup(e.target); });
+
   const pre = JSON.parse(document.getElementById('prefill-links').textContent || '[]');
   pre.forEach(u => addRow(u));
-  if (!pre.length) addRow('', 'Paste a Spotify, Apple Music or YouTube link');
+  if (!pre.length) addRow('', 'Paste a Spotify, Apple Music or SoundCloud link');
   document.getElementById('add-link').addEventListener('click', () => addRow('', 'https://…').focus());
 
   const sel = document.getElementById('published-select'), pill = document.getElementById('status-pill');

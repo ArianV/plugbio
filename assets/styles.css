@@ -308,6 +308,8 @@ input[type=file]::file-selector-button{font:600 13px var(--font); color:var(--te
 .link-row input[type=url]{min-width:0}
 .link-row .remove{height:42px; padding:0 14px; border-radius:var(--radius-sm); font:500 13px var(--font); color:var(--muted); background:transparent; border:1px solid var(--border); cursor:pointer}
 .link-row .remove:hover{color:var(--danger); border-color:rgba(255,107,129,.4)}
+.lookup-status{margin-top:10px; color:var(--muted)}
+.link-btn{padding:0; border:0; background:none; font:inherit; color:var(--text); text-decoration:underline; cursor:pointer}
 .btn-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:4px}
 .cover-preview{width:120px; height:120px; border-radius:12px; object-fit:cover; display:block; margin-bottom:10px; border:1px solid var(--border)}
 @media (max-width:520px){

@@ -51,6 +51,7 @@ route('/login', 'routes/login.php');
 route('/register', 'routes/register.php');
 route('/logout', 'routes/logout.php');
 route('/pages/new', 'routes/pages_new.php');
+route('/pages/lookup', 'routes/pages_lookup.php');
 route('/profile', 'routes/profile_edit.php');
 route('/settings', 'routes/account_settings.php');
 route('/analytics', 'routes/analytics.php');
