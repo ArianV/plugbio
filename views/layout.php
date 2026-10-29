@@ -97,6 +97,7 @@ $full_bleed = $full_bleed ?? false;
           </button>
           <div class="menu" id="navMenu" hidden>
             <a href="<?= e(asset('pages/new')) ?>">New page</a>
+            <a href="<?= e(asset('analytics')) ?>">Analytics</a>
             <a href="<?= e($myProfileUrl) ?>">My profile</a>
             <a href="<?= e(asset('profile')) ?>">Edit profile</a>
             <a href="<?= e(asset('settings')) ?>">Settings</a>
