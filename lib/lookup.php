@@ -67,9 +67,9 @@ function lookup_cache_put(string $key, array $value, int $ttl): void {
 function lookup_norm(string $s): string {
   $s = mb_strtolower(html_entity_decode($s, ENT_QUOTES, 'UTF-8'));
   $s = str_replace(['&', '+'], ' and ', $s);
-  $s = preg_replace('/[(\[][^)\]]*\b(feat|ft|featuring|with|explicit|clean|remaster(ed)?|album version|original mix)\b[^)\]]*[)\]]/u', ' ', $s);
+  $s = preg_replace('/[(\[][^)\]]*\b(feat|ft|featuring|with|prod|explicit|clean|remaster(ed)?|album version|original mix|official (audio|video|music video)|music video|audio)\b[^)\]]*[)\]]/u', ' ', $s);
   $s = preg_replace('/\s+-\s+(.*remaster(ed)?.*|explicit|clean|single version|album version)$/u', '', $s);
-  $s = preg_replace('/\s(feat|ft|featuring)\.?\s.*$/u', '', $s);
+  $s = preg_replace('/\s(feat|ft|featuring|prod)\.?\s.*$/u', '', $s);
   // Strip accents for Latin titles; for other scripts (Japanese, Cyrillic…) keep the original letters.
   if (function_exists('iconv')) {
     $t = @iconv('UTF-8', 'ASCII//TRANSLIT', $s);
@@ -122,13 +122,36 @@ function lookup_read_source(string $url): ?array {
   if (preg_match('#deezer\.com/(?:[a-z]{2}/)?(track|album)/(\d+)#', $url, $m)) {
     return lookup_read_deezer($m[1], $m[2]);
   }
+  // The SoundCloud app shares short on.soundcloud.com links; I follow those to the real track first.
+  if (preg_match('~^https?://on\.soundcloud\.com/[A-Za-z0-9]+~i', $url, $m)) {
+    $url = lookup_follow_redirect($m[0]) ?? '';
+  }
   if (preg_match('~^https?://(?:www\.|m\.)?soundcloud\.com/[^/?]+/[^?#]+~i', $url, $m)) {
-    return lookup_read_soundcloud($m[0]);
+    return lookup_read_soundcloud(preg_replace('~^https?://(?:www\.|m\.)?~i', 'https://', $m[0]));
   }
   if (preg_match('#(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})#', $url, $m)) {
     return lookup_read_youtube($m[1]);
   }
   return null;
+}
+
+// Where a short share link ends up, without downloading the page. Only accepted if it lands on soundcloud.com.
+function lookup_follow_redirect(string $url): ?string {
+  $ch = curl_init($url);
+  curl_setopt_array($ch, [
+    CURLOPT_NOBODY          => true,
+    CURLOPT_FOLLOWLOCATION  => true,
+    CURLOPT_MAXREDIRS       => 4,
+    CURLOPT_PROTOCOLS       => CURLPROTO_HTTPS,
+    CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+    CURLOPT_CONNECTTIMEOUT  => 4,
+    CURLOPT_TIMEOUT         => 6,
+    CURLOPT_USERAGENT       => 'PlugBio/1.0 (+https://plugbio.me)',
+  ]);
+  curl_exec($ch);
+  $final = (string)curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+  curl_close($ch);
+  return preg_match('~^https://(?:www\.|m\.)?soundcloud\.com/~i', $final) ? $final : null;
 }
 
 function lookup_song_shape(string $kind, string $title, string $artist): array {
