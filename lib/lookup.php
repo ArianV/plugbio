@@ -32,6 +32,7 @@ function lookup_http(string $url, array $headers = [], ?string $post = null): ?a
   $body = curl_exec($ch);
   $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
   if ($body === false) error_log('[lookup] ' . parse_url($url, PHP_URL_HOST) . ': ' . curl_error($ch));
+  elseif ($code >= 400 && $code !== 404) error_log('[lookup] ' . parse_url($url, PHP_URL_HOST) . " answered $code: " . substr($body, 0, 200));
   curl_close($ch);
   if ($body === false || $code < 200 || $code >= 300) return null;
   $j = json_decode($body, true);
